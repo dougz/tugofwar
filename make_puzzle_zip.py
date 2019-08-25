@@ -12,8 +12,12 @@ with zipfile.ZipFile("tugofwar.zip", mode="w") as z:
     with open("solution.html", "rb") as f_in:
       f_out.write(f_in.read())
 
-  with z.open("metadata.cfg", "w") as f_out:
-    with open("metadata.cfg", "rb") as f_in:
+  with z.open("for_ops.html", "w") as f_out:
+    with open("for_ops.html", "rb") as f_in:
+      f_out.write(f_in.read())
+
+  with z.open("metadata.yaml", "w") as f_out:
+    with open("metadata.yaml", "rb") as f_in:
       f_out.write(f_in.read())
 
   with z.open("tugofwar.css", "w") as f_out:

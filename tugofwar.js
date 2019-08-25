@@ -1,5 +1,5 @@
 goog.require('goog.dom');
-goog.require('goog.dom.TagName');
+goog.require("goog.dom.classlist");
 goog.require('goog.events');
 goog.require('goog.events.KeyCodes');
 goog.require('goog.net.XhrIo');
@@ -106,8 +106,10 @@ class TugOfWarDispatcher {
     set_buttons(msg) {
 	tugofwar.left_button.innerHTML = msg.left;
 	tugofwar.left_button.className = "choice";
+	goog.dom.classlist.remove(tugofwar.left_button, "unselect");
 	tugofwar.right_button.innerHTML = msg.right;
 	tugofwar.right_button.className = "choice";
+	goog.dom.classlist.remove(tugofwar.right_button, "unselect");
 	if (msg.message) {
 	    tugofwar.message.innerHTML = msg.message;
 	}
@@ -130,8 +132,20 @@ class TugOfWarDispatcher {
     tally(msg) {
 	this.show_voters(tugofwar.left_voters, msg.left);
 	this.show_voters(tugofwar.right_voters, msg.right);
-	var pos = 225.0 * msg.net / msg.req;
-	tugofwar.target.setAttribute("cx", pos);
+	tugofwar.target_pos = 225.0 * msg.net / msg.req;
+	if (msg.message) {
+	    tugofwar.message.innerHTML = msg.message;
+	}
+
+	if (!(typeof msg.select === "undefined")) {
+	    console.log("final selection: " + msg.select);
+	    if (msg.select == 0 || msg.select == -1) {
+		goog.dom.classlist.add(tugofwar.right_button, "unselect");
+	    }
+	    if (msg.select == 1 || msg.select == -1) {
+		goog.dom.classlist.add(tugofwar.left_button, "unselect");
+	    }
+	}
     }
 
     show_voters(el, voters) {
@@ -167,6 +181,15 @@ function tugofwar_click(which) {
     }, "POST", msg);
 }
 
+function tugofwar_move_ball() {
+    if (tugofwar.current_pos == tugofwar.target_pos) return;
+    tugofwar.current_pos = 0.4 * tugofwar.target_pos + 0.6 * tugofwar.current_pos;
+    if (Math.abs(tugofwar.current_pos - tugofwar.target_pos) < 2) {
+	tugofwar.current_pos = tugofwar.target_pos;
+    }
+    tugofwar.target.setAttribute("cx", tugofwar.current_pos);
+}
+
 var tugofwar = {
     left_button: null,
     right_button: null,
@@ -181,6 +204,10 @@ var tugofwar = {
     preload: null,
     serializer: null,
     current_choice: null,
+
+    current_pos: 0,
+    target_pos: 0,
+    mover: null,
 }
 
 puzzle_init = function() {
@@ -204,6 +231,8 @@ puzzle_init = function() {
 		       goog.events.EventType.CLICK,
 		       goog.bind(tugofwar_click, null, 1));
 
+
+    tugofwar.mover = setInterval(tugofwar_move_ball, 20);
 
     tugofwar.waiter = new TugOfWarWaiter(new TugOfWarDispatcher());
     tugofwar.waiter.start();

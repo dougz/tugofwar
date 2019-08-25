@@ -67,3 +67,11 @@
     font-weight: bold;
 }
 
+@keyframes tugofwar_fade {
+    0% { opacity: 1 }
+    100% { opacity: 0 }
+}
+
+#puzz .unselect {
+    animation: tugofwar_fade 200ms ease-out forwards;
+}

@@ -83,7 +83,6 @@ class GameState:
         self.cond.notify_all()
 
   async def run_game(self):
-    start_text = "Click either button to start!"
     while True:
       self.current_choice = -1
       self.votes = (collections.OrderedDict(),
@@ -92,11 +91,13 @@ class GameState:
       await self.team.send_messages([{"method": "set_buttons",
                                       "left": "Ready!",
                                       "right": "Ready!",
-                                      "message": start_text,
+                                      "message": "Click either button to start!",
                                       "choice": -1}],
                                     sticky=1)
 
-      await self.get_selection()
+      result, msg = await self.get_selection()
+      await self.team.send_messages([msg])
+      await asyncio.sleep(1.0)
 
       for ch, (leftword, rightword, correct) in enumerate(self.wordpairs):
         deadline = time.time() + self.ROUND_TIME
@@ -104,31 +105,29 @@ class GameState:
         self.votes = (collections.OrderedDict(),
                       collections.OrderedDict())
 
-        if ch == 0:
-          text = "Think happy thoughts!"
-        elif ch % 2:
-          text = "Yes!"
-        else:
-          text = "Correct!"
-
         await self.team.send_messages([{"method": "set_buttons",
                                         "left": leftword,
                                         "right": rightword,
-                                        "message": text,
+                                        "message": "Think happy thoughts!",
                                         "choice": ch,
                                         "end_time": deadline}],
                                       sticky=1)
 
-        picked = await self.get_selection(deadline)
-        if picked != correct: break
+        result, msg = await self.get_selection(deadline)
+        if result == correct:
+          msg["message"] = "Correct!"
+        elif result == -1:
+          msg["message"] = "Out of time!"
+        else:
+          msg["message"] = "That's not a happy thought!"
+          msg["select"] = -1
+        await self.team.send_messages([msg])
+        await asyncio.sleep(1.0)
+
+        if result != correct: break
       else:
         # reached the end
         break
-
-      if picked is None:
-        start_text = "Out of time!  Click either button to start again!"
-      else:
-        start_text = "That's not a happy thought!  Click either button to start again!"
 
     print("all done")
 
@@ -156,9 +155,11 @@ class GameState:
                                         "req": self.options.min_players}])
 
         if net >= self.options.min_players:
-          return 1
+          result = 1
+          break
         if net <= -self.options.min_players:
-          return 0
+          result = 0
+          break
 
         if deadline is None:
           await self.cond.wait()
@@ -168,7 +169,21 @@ class GameState:
             if timeout <= 0: break
             await asyncio.wait_for(self.cond.wait(), timeout)
           except asyncio.TimeoutError:
+            # On timeout, take whichever side is ahead.
+            if net > 0:
+              result = 1
+            elif net < 0:
+              result = 0
+            else:
+              result = -1
             break
+
+    return (result, {"method": "tally",
+                     "left": list(self.votes[0].values()),
+                     "right": list(self.votes[1].values()),
+                     "net": net,
+                     "req": self.options.min_players,
+                     "select": result})
 
 
 class ClickHandler(tornado.web.RequestHandler):
@@ -184,7 +199,6 @@ class ClickHandler(tornado.web.RequestHandler):
       clicked = self.args["clicked"]
       who = self.args["who"].strip()
       if not who: who = "anonymous"
-      print(f"{team}: {who} submitted {clicked}")
 
       await gs.set_vote(session, who, clicked)
 
