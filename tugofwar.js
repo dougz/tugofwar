@@ -69,6 +69,9 @@ class TugOfWarCountdown {
 
     reset(end_time) {
 	this.end_time = end_time;
+	if (!this.timer) {
+	    this.timer = setInterval(goog.bind(this.update_timer, this), 200);
+	}
 	this.update_timer();
     }
 
@@ -84,7 +87,8 @@ class TugOfWarCountdown {
 
     finish() {
 	clearInterval(this.timer);
-	tugofwar.countdown_text.innerHTML = "";
+	this.timer = null;
+	tugofwar.countdown_text.innerHTML = "&nbsp;";
     }
 }
 
@@ -145,6 +149,9 @@ class TugOfWarDispatcher {
 	    if (msg.select == 1 || msg.select == -1) {
 		goog.dom.classlist.add(tugofwar.left_button, "unselect");
 	    }
+	    if (tugofwar.countdown) {
+		tugofwar.countdown.finish();
+	    }
 	}
     }
 
@@ -169,6 +176,7 @@ function tugofwar_click(which) {
     }
 
     var username = tugofwar.who.value;
+    localStorage.setItem("name", username);
     var msg = tugofwar.serializer.serialize(
 	{"choice": tugofwar.current_choice,
 	 "who": username,
@@ -220,6 +228,7 @@ puzzle_init = function() {
     tugofwar.right_voters = goog.dom.getElement("rightvoters");
     tugofwar.message = goog.dom.getElement("message");
     tugofwar.who = goog.dom.getElement("who");
+    tugofwar.who.value = localStorage.getItem("name");
     tugofwar.countdown_text = goog.dom.getElement("countdown");
     tugofwar.tally = goog.dom.getElement("tally");
     tugofwar.target = goog.dom.getElement("target");

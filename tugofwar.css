@@ -69,7 +69,8 @@
 
 @keyframes tugofwar_fade {
     0% { opacity: 1 }
-    100% { opacity: 0 }
+    100% { opacity: 0;
+	   transform: translateY(12px); }
 }
 
 #puzz .unselect {

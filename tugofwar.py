@@ -94,8 +94,8 @@ class GameState:
                                       "message": "Click either button to start!",
                                       "choice": -1}],
                                     sticky=1)
-
       result, msg = await self.get_selection()
+      msg["message"] = "Here we go!"
       await self.team.send_messages([msg])
       await asyncio.sleep(1.0)
 
