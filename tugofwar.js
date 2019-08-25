@@ -16,7 +16,7 @@ class TugOfWarWaiter {
 	/** @type{number} */
 	this.backoff = 100;
 
-	/** @type(Dispatcher) */
+	/** @type{TugOfWarDispatcher} */
 	this.dispatcher = dispatcher;
     }
 
@@ -41,7 +41,7 @@ class TugOfWarWaiter {
 
         this.backoff = 100;
 
-	var msgs = /** @type{Array<Message>} */ (this.xhr.getResponseJson());
+	var msgs = /** @type{Array<Array<Message|number>>} */ (this.xhr.getResponseJson());
 	for (var i = 0; i < msgs.length; ++i) {
 	    this.serial = /** @type{number} */ (msgs[i][0]);
 	    var msg = /** @type{Message} */ (msgs[i][1]);
