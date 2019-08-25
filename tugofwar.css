@@ -18,7 +18,7 @@
     color: white;
     padding: 15px 32px;
     border-radius: 8px;
-    width: 180px;
+    width: 220px;
     margin: 0 12px;
     font-size: 144%;
     font-weight: bold;
@@ -30,7 +30,7 @@
     color: white;
     padding: 15px 32px;
     border-radius: 8px;
-    width: 180px;
+    width: 220px;
     margin: 0 12px;
     font-size: 144%;
     font-weight: bold;
@@ -76,3 +76,8 @@
 #puzz .unselect {
     animation: tugofwar_fade 200ms ease-out forwards;
 }
+
+#puzz table#matches { margin-top: 20px; }
+#puzz #matches th { background-color: #eee; }
+#puzz #matches td { width: 180px; padding: 2px 20px; text-align: center; }
+#puzz #matches .correct { font-weight: bold; background-color: #dfd}

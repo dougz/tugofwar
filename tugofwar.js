@@ -98,6 +98,7 @@ class TugOfWarDispatcher {
 	this.methods = {
 	    "set_buttons": goog.bind(this.set_buttons, this),
 	    "tally": goog.bind(this.tally, this),
+	    "finish": goog.bind(this.finish, this),
 	}
     }
 
@@ -108,6 +109,7 @@ class TugOfWarDispatcher {
 
     /** @param{Message} msg */
     set_buttons(msg) {
+	goog.dom.classlist.remove(tugofwar.tally, "unselect");
 	tugofwar.left_button.innerHTML = msg.left;
 	tugofwar.left_button.className = "choice";
 	goog.dom.classlist.remove(tugofwar.left_button, "unselect");
@@ -133,6 +135,17 @@ class TugOfWarDispatcher {
     }
 
     /** @param{Message} msg */
+    finish(msg) {
+	goog.dom.classlist.add(tugofwar.left_button, "unselect");
+	goog.dom.classlist.add(tugofwar.right_button, "unselect");
+	goog.dom.classlist.add(tugofwar.tally, "unselect");
+	tugofwar.target_pos = 0;
+	if (msg.message) {
+	    tugofwar.message.innerHTML = msg.message;
+	}
+    }
+
+    /** @param{Message} msg */
     tally(msg) {
 	this.show_voters(tugofwar.left_voters, msg.left);
 	this.show_voters(tugofwar.right_voters, msg.right);
@@ -142,7 +155,6 @@ class TugOfWarDispatcher {
 	}
 
 	if (!(typeof msg.select === "undefined")) {
-	    console.log("final selection: " + msg.select);
 	    if (msg.select == 0 || msg.select == -1) {
 		goog.dom.classlist.add(tugofwar.right_button, "unselect");
 	    }
@@ -151,6 +163,21 @@ class TugOfWarDispatcher {
 	    }
 	    if (tugofwar.countdown) {
 		tugofwar.countdown.finish();
+	    }
+
+	    if (msg.matchleft) {
+		if (!goog.dom.getFirstElementChild(tugofwar.matches)) {
+		    var th = goog.dom.createDom("TH", {colSpan: 2}, "Previous matches:");
+		    var tr = goog.dom.createDom("TR", null, th)
+		    tugofwar.matches.appendChild(tr);
+		}
+
+		var tdl = goog.dom.createDom("TD", "left" + (msg.matchcorrect == 0 ? " correct" : ""), msg.matchleft);
+		var tdr = goog.dom.createDom("TD", "right" + (msg.matchcorrect == 1 ? " correct" : ""), msg.matchright);
+		var tr = goog.dom.createDom("TR", null, tdl, tdr);
+		tugofwar.matches.appendChild(tr);
+	    } else {
+		tugofwar.matches.innerHTML = "";
 	    }
 	}
     }
@@ -212,6 +239,7 @@ var tugofwar = {
     preload: null,
     serializer: null,
     current_choice: null,
+    matches: null,
 
     current_pos: 0,
     target_pos: 0,
@@ -232,6 +260,7 @@ puzzle_init = function() {
     tugofwar.countdown_text = goog.dom.getElement("countdown");
     tugofwar.tally = goog.dom.getElement("tally");
     tugofwar.target = goog.dom.getElement("target");
+    tugofwar.matches = goog.dom.getElement("matches");
 
     goog.events.listen(tugofwar.left_button,
 		       goog.events.EventType.CLICK,

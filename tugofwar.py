@@ -83,6 +83,7 @@ class GameState:
         self.cond.notify_all()
 
   async def run_game(self):
+    start_text = "Click either button to start!"
     while True:
       self.current_choice = -1
       self.votes = (collections.OrderedDict(),
@@ -91,7 +92,7 @@ class GameState:
       await self.team.send_messages([{"method": "set_buttons",
                                       "left": "Ready!",
                                       "right": "Ready!",
-                                      "message": "Click either button to start!",
+                                      "message": start_text,
                                       "choice": -1}],
                                     sticky=1)
       result, msg = await self.get_selection()
@@ -116,6 +117,9 @@ class GameState:
         result, msg = await self.get_selection(deadline)
         if result == correct:
           msg["message"] = "Correct!"
+          msg["matchleft"] = leftword
+          msg["matchright"] = rightword
+          msg["matchcorrect"] = correct
         elif result == -1:
           msg["message"] = "Out of time!"
         else:
@@ -126,10 +130,12 @@ class GameState:
 
         if result != correct: break
       else:
-        # reached the end
-        break
+        await self.team.send_messages([{"method": "finish",
+                                        "message": "All done!"}])
+        await asyncio.sleep(10.0)
 
-    print("all done")
+        # reached the end
+        start_text = "Click either button to start over!"
 
   async def set_vote(self, session, name, clicked):
     if clicked not in (0, 1): return

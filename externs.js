@@ -25,5 +25,11 @@ class Message {
 	this.net;
 	/** @type{?number} */
 	this.req;
+	/** @type{?string} */
+	this.matchleft;
+	/** @type{?string} */
+	this.matchright;
+	/** @type{?number} */
+	this.matchcorrect;
     }
 }
