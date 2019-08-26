@@ -237,14 +237,16 @@ class DebugHandler(tornado.web.RequestHandler):
 
 def make_app(options):
   GameState.set_globals(options)
-  return [
-    (r"/tugclick", ClickHandler),
-    (r"/tugdebug/(\S+)", DebugHandler),
-  ]
+  handlers = [(r"/tugclick", ClickHandler)]
+  if options.debug:
+    handlers.append((r"/tugdebug/(\S+)", DebugHandler))
+  return handlers
 
 
 def main():
   parser = argparse.ArgumentParser(description="Run the tug of war puzzle.")
+  parser.add_argument("--debug", action="store_true",
+                      help="Run in debug mode.")
   parser.add_argument("-c", "--cookie_secret",
                       default="snellen2020",
                       help="Secret used to create session cookies.")
