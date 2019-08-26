@@ -162,9 +162,11 @@ class GameState:
 
         if net >= self.options.min_players:
           result = 1
+          net = self.options.min_players
           break
         if net <= -self.options.min_players:
           result = 0
+          net = -self.options.min_players
           break
 
         if deadline is None:
