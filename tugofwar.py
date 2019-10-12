@@ -76,6 +76,13 @@ class GameState:
     self.cond = asyncio.Condition()
     self.current_pair = None
 
+    if self.options.min_players is not None:
+      self.min_size = self.options.min_players
+    else:
+      self.min_size = (team.size + 1) // 2
+      if self.min_size > 20:
+        self.min_size = 20
+
   async def on_wait(self, session):
     async with self.cond:
       if session not in self.sessions:
@@ -158,15 +165,15 @@ class GameState:
                                         "left": list(self.votes[0].values()),
                                         "right": list(self.votes[1].values()),
                                         "net": net,
-                                        "req": self.options.min_players}])
+                                        "req": self.min_size}])
 
-        if net >= self.options.min_players:
+        if net >= self.min_size:
           result = 1
-          net = self.options.min_players
+          net = self.min_size
           break
-        if net <= -self.options.min_players:
+        if net <= -self.min_size:
           result = 0
-          net = -self.options.min_players
+          net = -self.min_size
           break
 
         if deadline is None:
@@ -190,7 +197,7 @@ class GameState:
                      "left": list(self.votes[0].values()),
                      "right": list(self.votes[1].values()),
                      "net": net,
-                     "req": self.options.min_players,
+                     "req": self.min_size,
                      "select": result})
 
 
@@ -256,7 +263,7 @@ def main():
                       help="Path for wait requests from frontend.")
   parser.add_argument("--main_server_port", type=int, default=2020,
                       help="Port to use for requests to main server.")
-  parser.add_argument("--min_players", type=int, default=1,
+  parser.add_argument("--min_players", type=int, default=None,
                       help="Number of players needed to make a choice.")
 
   options = parser.parse_args()

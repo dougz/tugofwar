@@ -1,7 +1,11 @@
 shortname: tug_of_war
 title: Tug of War
 author: Asher Walkover
-answer: GEORGE ELIOT
+answer: MINIMAL CLOUD STORAGE
+
+responses:
+  GEORGE ELIOT:  "Correct! But for the purposes of this playtest, pretend you got the answer <b>MINIMAL CLOUD STORAGE</b> (and submit that)."
+
 puzzletron_id: 152
 oncall: dougz@isotropic.org
 obfuscate_assets: true
