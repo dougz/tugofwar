@@ -38,6 +38,9 @@ with zipfile.ZipFile("tug_of_war.zip", mode="w") as z:
     with open("metadata.yaml", "rb") as f_in:
       f_out.write(f_in.read())
 
+  z.write("static_puzzle.html")
+  z.write("static_9098.js")
+
   if not options.debug:
     with z.open("tugofwar.css", "w") as f_out:
       with open("tugofwar.css", "rb") as f_in:

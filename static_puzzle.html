@@ -1,0 +1,48 @@
+<head>
+  <style>
+.button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 16px;
+  width: 180px;
+}
+
+.button:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+.timer {
+  color: red;
+  font-size: 24px;
+}
+  </style>
+  <script src="static_9098.js"></script>
+</head>
+<body id=puzz>  
+<div class=fourthwall style="background-color: white; border: 2px dotted blue;">
+  <p>
+  This was a "scrum" puzzle&mdash;a puzzle meant to be solved by many teammates
+  looking at their computers at the same time.
+  The game showed each player a pair of choices with voting buttons.
+  And there was a deadline clock.
+  Once enough players had voted, the winning choice became the team choice.
+  For this after-the-hunt version, we'll let you make all the choices on your own.
+</div>
+
+<center>
+  <p>
+    <input id="button1" class="button" type = "button" value="Ready!" onclick="clicked(1);">
+    &emsp;&emsp;
+    <input id="button2" class="button" type = "button" value="Ready!" onclick="clicked(2);">
+
+  <p id="demo">Click either button to start!</p>
+  <div id="timerText" class="timer"></div>
+</center>
+
+</body>
