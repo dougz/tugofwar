@@ -222,7 +222,7 @@ class ClickHandler(tornado.web.RequestHandler):
 
 
 class TugOfWarApp(scrum.ScrumApp):
-  async def on_wait(self, team, session):
+  async def on_wait(self, team, session, wid):
     gs = GameState.get_for_team(team)
 
     if not gs.running:
