@@ -5,6 +5,16 @@
     align-items: center;
 }
 
+#puzz div#top {
+    width: 900px;
+    background-color: #eee;
+    margin: 0 0 40px 0;
+}
+
+#puzz div#top > div {
+    margin: 16px;
+}
+
 #puzz div#buttons {
     display: flex;
     flex-direction: row;

@@ -31,5 +31,7 @@ class Message {
 	this.matchright;
 	/** @type{?number} */
 	this.matchcorrect;
+	/** @type{?string} */
+	this.players;
     }
 }

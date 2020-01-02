@@ -43,12 +43,19 @@ class TugOfWarDispatcher {
 	    "set_buttons": goog.bind(this.set_buttons, this),
 	    "tally": goog.bind(this.tally, this),
 	    "finish": goog.bind(this.finish, this),
+            "players": this.players,
 	}
     }
 
     /** @param{Message} msg */
     dispatch(msg) {
 	this.methods[msg.method](msg);
+    }
+
+    /** @param{Message} msg */
+    players(msg) {
+        var el = goog.dom.getElement("players");
+        el.innerHTML = "<b>Players:</b> " + msg.players;
     }
 
     /** @param{Message} msg */
@@ -152,12 +159,7 @@ function tugofwar_click(which) {
 	{"choice": tugofwar.current_choice,
 	 "who": username,
 	 "clicked": which});
-    goog.net.XhrIo.send("/tugclick", function(e) {
-     	var code = e.target.getStatus();
-     	if (code != 204) {
-     	    alert(e.target.getResponseText());
-     	}
-    }, "POST", msg);
+    goog.net.XhrIo.send("/tugclick", Common_expect_204, "POST", msg);
 }
 
 function tugofwar_move_ball() {
@@ -167,6 +169,15 @@ function tugofwar_move_ball() {
 	tugofwar.current_pos = tugofwar.target_pos;
     }
     tugofwar.target.setAttribute("cx", tugofwar.current_pos);
+}
+
+function tugofwar_send_name() {
+    var name = tugofwar.who.value;
+    if (name != tugofwar.sent_name) {
+        tugofwar.sent_name = name;
+        var msg = tugofwar.serializer.serialize({"who": name});
+        goog.net.XhrIo.send("/tugname", Common_expect_204, "POST", msg);
+    }
 }
 
 var tugofwar = {
@@ -188,6 +199,8 @@ var tugofwar = {
     current_pos: 0,
     target_pos: 0,
     mover: null,
+
+    sent_name: null,
 }
 
 puzzle_init = function() {
@@ -218,5 +231,7 @@ puzzle_init = function() {
 
     tugofwar.waiter = new Common_Waiter(new TugOfWarDispatcher(), "/tugwait", 0, null, null);
     tugofwar.waiter.start();
+
+    setInterval(tugofwar_send_name, 1000);
 }
 
