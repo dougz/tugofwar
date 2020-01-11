@@ -77,12 +77,7 @@ class GameState:
     self.cond = asyncio.Condition()
     self.current_pair = None
 
-    if self.options.min_players is not None:
-      self.min_size = self.options.min_players
-    else:
-      self.min_size = (team.size + 1) // 4
-      if self.min_size > 20:
-        self.min_size = 20
+    self.min_size = scrum.default_min_players(self.options, team.size)
 
   async def on_wait(self, session):
     async with self.cond:
