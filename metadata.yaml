@@ -3,6 +3,9 @@ title: Tug of War
 author: Asher Walkover
 answer: GEORGE ELIOT
 
+responses:
+    ELIOT: ~
+
 scrum: true
 
 puzzletron_id: 152
